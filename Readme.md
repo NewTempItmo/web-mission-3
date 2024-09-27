@@ -6,7 +6,7 @@
 
 ## Part 3
 
-###Queries:
+### Queries:
 -- 1. Получить список юзернеймов пользователей\
 SELECT DISTINCT username FROM users;
 
