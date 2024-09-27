@@ -1,30 +1,35 @@
-# Mission 2
+# Mission 3
 
 ## Part 0
 
-[Link to video](https://www.youtube.com/watch?v=UUhavvMO2FQ)
+[Link to video](https://drive.google.com/file/d/1wCCOy--9CXWEBXnovKiLMUY8UDGsRIrd/view?usp=sharing)
 
-## Part 1
+## Part 3
 
-- Вопрос 1  
-> ssh - это протокол для безопасного удаленного управления серверами и обмена данными по зашифрованным каналам. Он позволяет пользователям безопасно подключаться к удалённым системам и передавать команды, файлы или данные через небезопасные сети.
+>Queries:
+-- 1. Получить список юзернеймов пользователей
+SELECT DISTINCT username FROM users;
 
-- Вопрос 2  
-> Публичный ключ необходимо добавить в файл `~/.ssh/authorized_keys` на сервере. Этот файл содержит список публичных ssh-ключей, которым разрешено подключаться к серверу.
+-- 2. Получить количество отправленных сообщений каждым пользователем
+SELECT u.username, COUNT(m.id) AS "number_of_sent_messages"
+FROM messages m
+JOIN users u ON m.from = u.id
+GROUP BY u.username;
 
-- Вопрос 3  
-> long polling - это техника, при которой клиент отправляет запрос к серверу и сервер держит этот запрос открытым до тех пор, пока не появятся новые данные. Как только они появляются, сервер возвращает ответ, а клиент немедленно отправляет новый запрос для получения следующих данных. Это позволяет имитировать постоянное соединение.  
-> webhooks - это механизм, при котором сервер отправляет данные клиенту, как только что-то происходит (например, событие или изменение). Клиент предоставляет серверу URL, и сервер автоматически отправляет HTTP-запрос на этот URL при возникновении соответствующего события.
+-- 3. Получить пользователя с самым большим количеством полученных сообщений и само количество
+SELECT u.username, COUNT(m.id) AS "number_of_received_messages"
+FROM messages m
+JOIN users u ON m.to = u.id
+GROUP BY u.username
+ORDER BY COUNT(m.id) DESC
+LIMIT 1;
 
-- Вопрос 4  
-> issues на GitHub - это система отслеживания задач, проблем и предложений для проекта. Issues позволяют разработчикам и пользователям сообщать о багах, предлагать улучшения, отслеживать прогресс и вести обсуждения по конкретным аспектам проекта.  
-> Примеры:  
-> - [TensorFlow Issue #54373](https://github.com/tensorflow/tensorflow/issues/54373)  
-> - [React Issue #26748](https://github.com/facebook/react/issues/26748)
-
-- Вопрос 5  
-> Так как Git не отслеживает пустые папки, нужно создать в этой папке файл-заглушку. Обычно создается файл с именем `.gitkeep`, чтобы папка не считалась пустой и была добавлена в репозиторий.  
-> Пример:  
-> ```bash
-> touch images/.gitkeep
-> ```
+-- 4. Получить среднее количество сообщений, отправленное каждым пользователем
+SELECT u.username, AVG(message_count.cnt) AS "average_sent_messages"
+FROM (
+    SELECT m.from, COUNT(*) AS cnt
+    FROM messages m
+    GROUP BY m.from
+) AS message_count
+JOIN users u ON message_count.from = u.id
+GROUP BY u.username;
